@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetroVault | Hall of Fame</title>
+    
+    <style>
+        /* --- DESIGN SYSTEM (METAL/RETRO) --- */
+        :root {
+            --primary: #00ff41; 
+            --bg-dark: #0a0a0a;
+            --card-bg: #161616;
+            --accent: #ff003c; 
+            --gold: #ffd700;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg-dark);
+            color: #eee;
+            overflow-x: hidden;
+        }
+
+        header {
+            padding: 40px 20px;
+            text-align: center;
+            background: linear-gradient(to bottom, #111, var(--bg-dark));
+            border-bottom: 2px solid var(--primary);
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        .subtitle { color: #666; margin-top: 5px; font-weight: bold; }
+
+        .search-controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        input, select {
+            padding: 12px;
+            background: #000;
+            border: 1px solid #333;
+            color: var(--primary);
+            border-radius: 4px;
+            outline: none;
+        }
+
+        input:focus, select:focus { border-color: var(--primary); }
+
+        /* Griglia */
+        .container { padding: 40px 20px; max-width: 1400px; margin: 0 auto; }
+        
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 30px;
+        }
+
+        /* Card "Hall of Fame" */
+        .game-card {
+            background: var(--card-bg);
+            border: 1px solid #222;
+            border-radius: 8px;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.15);
+        }
+
+        /* Badge Popolarità */
+        .rank-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--primary);
+            color: #000;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            border-radius: 3px;
+            z-index: 2;
+        }
+
+        .game-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid #222;
+            transition: 0.5s;
+        }
+
+        .game-card:hover img { filter: brightness(1.2); }
+
+        .game-info { padding: 15px; text-align: center; }
+        .game-info h3 { font-size: 0.9rem; color: #fff; margin-bottom: 5px; }
+        .game-info .downloads { font-size: 0.7rem; color: var(--primary); opacity: 0.7; }
+
+        /* Modal */
+        #gameModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content { border: 2px solid var(--primary); background: #000; position: relative; }
+        #closeBtn { position: absolute; top: -40px; right: 0; background: var(--accent); color: white; border: none; padding: 5px 15px; cursor: pointer; }
+
+        .loading { text-align: center; padding: 50px; color: var(--primary); font-size: 1.5rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>RetroVault</h1>
+        <p class="subtitle">>_ LOADING HALL OF FAME: I 25 TITOLI PIÙ GIOCATI DI SEMPRE</p>
+        
+        <div class="search-controls">
+            <select id="categorySelect">
+                <option value="">Tutti i Generi</option>
+                <option value="Action">Azione</option>
+                <option value="Shooter">Sparatutto</option>
+                <option value="Adventure">Avventura</option>
+                <option value="Strategy">Strategia</option>
+                <option value="Simulation">Simulazione</option>
+                <option value="RPG">GDR</option>
+            </select>
+            <input type="text" id="searchInput" placeholder="Cerca nel database...">
+            <button id="searchBtn" style="background:var(--primary); border:none; padding:10px 20px; font-weight:bold; cursor:pointer;">CERCA</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="gameGrid" class="game-grid">
+            </div>
+    </div>
+
+    <div id="gameModal">
+        <div class="modal-content">
+            <button id="closeBtn" onclick="closeGame()">ESCI [ESC]</button>
+            <iframe id="gameFrame" width="640" height="480" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <p style="color:var(--primary); margin-top:20px; font-size:0.8rem;">COMANDI: Frecce, CTRL, ALT, Spazio, Invio</p>
+    </div>
+
+    <script>
+        const gameGrid = document.getElementById('gameGrid');
+        const searchInput = document.getElementById('searchInput');
+        const categorySelect = document.getElementById('categorySelect');
+        const searchBtn = document.getElementById('searchBtn');
+        const modal = document.getElementById('gameModal');
+        const iframe = document.getElementById('gameFrame');
+
+        // URL configurato per 25 risultati ordinati per download (successo storico)
+        const API_BASE = "https://archive.org/advancedsearch.php?q=collection:(softwarelibrary_msdos_games)";
+        const API_CONFIG = "&rows=25&page=1&output=json&sort[]=downloads desc";
+
+        async function loadHallOfFame() {
+            gameGrid.innerHTML = '<div class="loading">ESTRAZIONE DATI STORICI...</div>';
+            
+            const query = searchInput.value;
+            const category = categorySelect.value;
+            
+            let searchParams = "";
+            if (query) searchParams += ` AND title:(${query})`;
+            if (category) searchParams += ` AND subject:(${category})`;
+            
+            const url = `${API_BASE}${searchParams}${API_CONFIG}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                renderHallOfFame(data.response.docs);
+            } catch (err) {
+                gameGrid.innerHTML = '<div class="loading" style="color:red;">ERRORE DI TRASMISSIONE.</div>';
+            }
+        }
+
+        function renderHallOfFame(games) {
+            gameGrid.innerHTML = "";
+            
+            games.forEach((game, index) => {
+                const imgUrl = `https://archive.org/services/img/${game.identifier}`;
+                const downloads = game.downloads ? parseInt(game.downloads).toLocaleString() : "N/D";
+                
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.innerHTML = `
+                    <div class="rank-badge">#${index + 1} TOP</div>
+                    <img src="${imgUrl}" onerror="this.src='https://via.placeholder.com/240x180/000/00ff41?text=${game.identifier}'">
+                    <div class="game-info">
+                        <h3>${game.title}</h3>
+                        <div class="downloads">💾 ${downloads} PLAY</div>
+                    </div>
+                `;
+                
+                card.onclick = () => openGame(game.identifier);
+                gameGrid.appendChild(card);
+            });
+        }
+
+        function openGame(id) {
+            iframe.src = `https://archive.org/embed/${id}`;
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeGame() {
+            iframe.src = "";
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        searchBtn.onclick = loadHallOfFame;
+        categorySelect.onchange = loadHallOfFame;
+        searchInput.onkeypress = (e) => { if(e.key === 'Enter') loadHallOfFame(); };
+        window.onkeydown = (e) => { if(e.key === "Escape") closeGame(); };
+
+        // Avvio automatico
+        loadHallOfFame();
+    </script>
+</body>
+</html>
