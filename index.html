@@ -1,154 +1,55 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thunderbax.org | Steampunk Hub</title>
-    <style>
-        :root {
-            --bronze: #a86b32;
-            --gold: #d4af37;
-            --rust: #8b4513;
-            --dark-overlay: rgba(15, 23, 42, 0.6);
-            --glass: rgba(44, 24, 16, 0.7);
-        }
+<style>
+    /* ... resto del CSS ... */
 
-        body {
-            font-family: 'Garamond', serif; /* Un font più classico/vittoriano */
-            background: url('logo steampunk.png') no-repeat center center fixed;
-            background-size: cover;
-            color: #f1e7d0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+    header {
+        text-align: center;
+        margin-top: 3rem;
+        z-index: 20;
+        /* Creiamo una fascia scura sfumata dietro il titolo per isolarlo dallo sfondo */
+        background: radial-gradient(ellipse at center, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 80%);
+        padding: 40px 20px;
+        width: 100%;
+    }
 
-        /* Overlay per scurire leggermente lo sfondo e leggere meglio i testi */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.4) 80%);
-            z-index: -1;
-        }
+    h1 {
+        font-size: 4.5rem;
+        margin: 0;
+        color: var(--gold);
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        font-weight: bold;
+        /* Triplo shadow: uno scuro per il distacco, uno bronzo per l'effetto bagliore */
+        text-shadow: 
+            3px 3px 0px rgba(0,0,0,1), 
+            -1px -1px 0px rgba(0,0,0,1),
+            0px 0px 20px rgba(168, 107, 50, 0.8); 
+        border-bottom: 3px solid var(--bronze);
+        display: inline-block;
+        padding-bottom: 5px;
+    }
 
-        header {
-            text-align: center;
-            margin-bottom: 3rem;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
-        }
+    .subtitle {
+        font-family: 'Courier New', Courier, monospace; /* Font stile macchina da scrivere */
+        font-style: normal;
+        font-weight: bold;
+        font-size: 1.4rem;
+        margin-top: 15px;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        /* Ombra netta nera per rendere le lettere leggibili su qualsiasi colore */
+        text-shadow: 2px 2px 4px rgba(0,0,0,1);
+        background: rgba(139, 69, 19, 0.3); /* Un tocco di ruggine trasparente */
+        display: inline-block;
+        padding: 5px 20px;
+        border-radius: 5px;
+    }
+    
+    /* ... resto del CSS ... */
+</style>
 
-        h1 {
-            font-size: 4rem;
-            margin: 0;
-            color: var(--gold);
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            border-bottom: 2px solid var(--bronze);
-            padding-bottom: 10px;
-        }
-
-        .subtitle {
-            font-style: italic;
-            font-size: 1.2rem;
-            margin-top: 10px;
-            color: #d1d5db;
-        }
-
-        .container {
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
-            justify-content: center;
-            max-width: 1000px;
-        }
-
-        .card {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 2.5rem;
-            border-radius: 15px;
-            width: 300px;
-            text-align: center;
-            text-decoration: none;
-            color: #f1e7d0;
-            border: 2px solid var(--bronze);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .card:hover {
-            transform: scale(1.05);
-            border-color: var(--gold);
-            background: rgba(168, 107, 50, 0.4);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
-        }
-
-        .card h2 {
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
-            color: var(--gold);
-            text-transform: uppercase;
-        }
-
-        .card p {
-            line-height: 1.6;
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-
-        footer {
-            margin-top: 5rem;
-            font-size: 0.9rem;
-            color: var(--gold);
-            background: rgba(0,0,0,0.5);
-            padding: 10px 20px;
-            border-radius: 20px;
-        }
-
-        /* Effetto pulsante per i link */
-        .btn-link {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 8px 20px;
-            background: var(--bronze);
-            color: white;
-            border-radius: 5px;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-        }
-    </style>
-</head>
-<body>
-
-    <header>
-        <h1>Thunderbax</h1>
-        <p class="subtitle">Laboratorio Digitale & Ingranaggi Creativi</p>
-    </header>
-
-    <div class="container">
-        <a href="wallpaper.html" class="card">
-            <h2>Wallpaper</h2>
-            <p>Galleria di visioni digitali e sfondi creati su misura.</p>
-            <div class="btn-link">Esplora</div>
-        </a>
-
-        <a href="abadonware.html" class="card">
-            <h2>Abadonware</h2>
-            <p>Recupero di software dal passato e archeologia informatica.</p>
-            <div class="btn-link">Accedi</div>
-        </a>
-    </div>
-
-    <footer>
-        &copy; 2026 Thunderbax.org - Pasticci di codice
-    </footer>
-
-</body>
-</html>
+<header>
+    <h1>Thunderbax</h1>
+    <br>
+    <p class="subtitle">Laboratorio Digitale & Ingranaggi Creativi</p>
+</header>
