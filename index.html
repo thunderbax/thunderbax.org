@@ -224,5 +224,131 @@
         }
         getWeatherData();
     </script>
+    <div id="tbbot-widget">
+        <div id="tbbot-icon" onclick="toggleChat()">⚙️</div>
+        
+        <div id="chat-window" class="chat-closed">
+            <div id="chat-header">
+                <span>TBBot v0.1-beta</span>
+                <span class="close-btn" onclick="toggleChat()">[x]</span>
+            </div>
+            <div id="chat-messages">
+                <div class="message bot-message">
+                    <span class="bot-name">TBBot:</span> Oh... ciao! *Cade una vite*... Sono TBBot, l'assistente... beh, ci provo! Sto... ehm... 'ottimizzando' il codice di Thunderbax.org. Hai visto il mio cacciavite?
+                </div>
+            </div>
+            <div id="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Scrivi un comando (o aiutami!)..." onkeypress="handleKeyPress(event)">
+                <button id="send-btn" onclick="sendMessage()">Invia</button>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        /* STILE GUSCIO CHAT */
+        #tbbot-widget { position: fixed; bottom: 20px; right: 20px; z-index: 1000; font-family: 'Courier New', Courier, monospace; }
+        
+        #tbbot-icon {
+            width: 60px; height: 60px; background: var(--glass); border: 2px solid var(--bronze);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            transition: transform 0.3s; backdrop-filter: blur(5px);
+        }
+        #tbbot-icon:hover { transform: rotate(90deg) scale(1.1); border-color: var(--gold); }
+    
+        #chat-window {
+            width: 350px; height: 500px; background: rgba(30, 20, 15, 0.9);
+            border: 2px solid var(--bronze); border-radius: 10px;
+            backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            display: flex; flex-direction: column; overflow: hidden;
+            transition: all 0.3s ease-in-out; opacity: 0; transform: translateY(20px); pointer-events: none;
+        }
+        
+        /* Classi per aprire/chiudere */
+        #chat-window.chat-open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        #tbbot-icon.icon-hidden { opacity: 0; pointer-events: none; }
+    
+        #chat-header {
+            background: var(--bronze); color: white; padding: 10px 15px;
+            font-weight: bold; display: flex; justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .close-btn { cursor: pointer; color: var(--gold); }
+    
+        #chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        
+        .message { max-width: 80%; padding: 8px 12px; border-radius: 8px; line-height: 1.4; font-size: 0.9rem; }
+        .bot-message { background: rgba(168, 107, 50, 0.2); align-self: flex-start; border: 1px solid var(--bronze); color: var(--gold); }
+        .user-message { background: rgba(255,255,255,0.1); align-self: flex-end; color: #f1e7d0; }
+        .bot-name { font-weight: bold; color: var(--bronze); margin-right: 5px; }
+    
+        #chat-input-area { display: flex; border-top: 1px solid var(--bronze); background: rgba(0,0,0,0.3); }
+        #chat-input { flex: 1; background: transparent; border: none; padding: 12px; color: var(--gold); outline: none; }
+        #send-btn { background: var(--bronze); border: none; color: white; padding: 0 20px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
+        #send-btn:hover { background: var(--rust); }
+    </style>
+    
+    <script>
+        // FUNZIONI LOGICA CHAT (FRONTEND)
+        const chatWindow = document.getElementById('chat-window');
+        const chatIcon = document.getElementById('tbbot-icon');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+    
+        function toggleChat() {
+            chatWindow.classList.toggle('chat-open');
+            chatIcon.classList.toggle('icon-hidden');
+        }
+    
+        function handleKeyPress(e) { if(e.key === 'Enter') sendMessage(); }
+    
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if(!text) return;
+    
+            // 1. Aggiungi messaggio utente
+            appendMessage(text, 'user');
+            chatInput.value = '';
+    
+            // 2. Aggiungi segnaposto di caricamento
+            const loadingId = 'loading-' + Date.now();
+            appendMessage('Sto... ehm... pensando... *Scintilla*...', 'bot', loadingId);
+    
+            try {
+                // 3. Chiamata alla tua Vercel Function (che creeremo)
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+                
+                const data = await response.json();
+                
+                // 4. Sostituisci segnaposto con la risposta vera
+                document.getElementById(loadingId).innerHTML = `<span class="bot-name">TBBot:</span> ${data.reply}`;
+                
+            } catch (error) {
+                document.getElementById(loadingId).innerHTML = `<span class="bot-name">TBBot:</span> Oh no! Un errore... *Cade un ingranaggio*... Riprovi più tardi?`;
+            }
+            
+            // Autoscroll verso il basso
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    
+        function appendMessage(text, sender, id = null) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}-message`;
+            if(id) msgDiv.id = id;
+            
+            if(sender === 'bot') {
+                msgDiv.innerHTML = `<span class="bot-name">TBBot:</span> ${text}`;
+            } else {
+                msgDiv.textContent = text;
+            }
+            
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
 </body>
 </html>
