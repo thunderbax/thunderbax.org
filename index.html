@@ -3,37 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thunderbax.org | Dashboard</title>
+    <title>Thunderbax.org | Steampunk Hub</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-color: #3b82f6; /* Blu moderno, ma puoi cambiarlo in #ef4444 per un rosso rock */
-            --text-color: #f8fafc;
+            --bronze: #a86b32;
+            --gold: #d4af37;
+            --rust: #8b4513;
+            --dark-overlay: rgba(15, 23, 42, 0.6);
+            --glass: rgba(44, 24, 16, 0.7);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: 'Garamond', serif; /* Un font più classico/vittoriano */
+            background: url('logo steampunk.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #f1e7d0;
+            margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Overlay per scurire leggermente lo sfondo e leggere meglio i testi */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.4) 80%);
+            z-index: -1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
         }
 
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
+            font-size: 4rem;
+            margin: 0;
+            color: var(--gold);
+            letter-spacing: 4px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            border-bottom: 2px solid var(--bronze);
+            padding-bottom: 10px;
         }
 
-        p.subtitle {
-            color: #94a3b8;
-            margin-bottom: 3rem;
+        .subtitle {
+            font-style: italic;
+            font-size: 1.2rem;
+            margin-top: 10px;
+            color: #d1d5db;
         }
 
         .container {
@@ -41,63 +64,90 @@
             gap: 2rem;
             flex-wrap: wrap;
             justify-content: center;
+            max-width: 1000px;
         }
 
         .card {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 12px;
-            width: 280px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            border-radius: 15px;
+            width: 300px;
             text-align: center;
             text-decoration: none;
-            color: inherit;
-            border: 1px solid transparent;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            color: #f1e7d0;
+            border: 2px solid var(--bronze);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .card:hover {
-            border-color: var(--accent-color);
-            transform: translateY(-5px);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+            transform: scale(1.05);
+            border-color: var(--gold);
+            background: rgba(168, 107, 50, 0.4);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
         }
 
         .card h2 {
-            margin-top: 0;
-            color: var(--accent-color);
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--gold);
+            text-transform: uppercase;
         }
 
         .card p {
-            font-size: 0.9rem;
-            color: #cbd5e1;
+            line-height: 1.6;
+            font-size: 1rem;
+            opacity: 0.9;
         }
 
         footer {
-            margin-top: 4rem;
+            margin-top: 5rem;
+            font-size: 0.9rem;
+            color: var(--gold);
+            background: rgba(0,0,0,0.5);
+            padding: 10px 20px;
+            border-radius: 20px;
+        }
+
+        /* Effetto pulsante per i link */
+        .btn-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 20px;
+            background: var(--bronze);
+            color: white;
+            border-radius: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
             font-size: 0.8rem;
-            color: #64748b;
         }
     </style>
 </head>
 <body>
 
-    <h1>Thunderbax</h1>
-    <p class="subtitle">Sviluppo Web & Progetti Digitali</p>
+    <header>
+        <h1>Thunderbax</h1>
+        <p class="subtitle">Laboratorio Digitale & Ingranaggi Creativi</p>
+    </header>
 
     <div class="container">
         <a href="wallpaper.html" class="card">
             <h2>Wallpaper</h2>
-            <p>Esplora la collezione di sfondi personalizzati.</p>
+            <p>Galleria di visioni digitali e sfondi creati su misura.</p>
+            <div class="btn-link">Esplora</div>
         </a>
 
         <a href="abadonware.html" class="card">
             <h2>Abadonware</h2>
-            <p>Un tuffo nel passato con software e risorse d'epoca.</p>
+            <p>Recupero di software dal passato e archeologia informatica.</p>
+            <div class="btn-link">Accedi</div>
         </a>
     </div>
 
     <footer>
-        &copy; 2026 Thunderbax.org - Made with passion in Marnate
+        &copy; 2026 Thunderbax.org - Pasticci di codice
     </footer>
 
 </body>
