@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThunderMovies - Esplora il Cinema</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #0b0f1a; color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .movie-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+        .movie-card:hover { transform: translateY(-5px); z-index: 10; box-shadow: 0 0 20px rgba(234, 179, 8, 0.3); }
+        .img-gradient { background: linear-gradient(to top, #0b0f1a 10%, transparent 100%); }
+        .modal-gradient { background: linear-gradient(to right, #0b0f1a 40%, transparent 100%); }
+        
+        #movie-modal.hidden { display: none; }
+        #movie-modal:not(.hidden) { display: flex; }
+        body.modal-open { overflow: hidden; }
+
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .thunder-text { text-shadow: 0 0 15px rgba(234, 179, 8, 0.5); }
+    </style>
+</head>
+<body class="p-6">
+
+    <header class="max-w-7xl mx-auto mb-10 text-center">
+        <h1 class="text-6xl font-black tracking-tighter bg-gradient-to-r from-yellow-300 via-yellow-500 to-orange-600 bg-clip-text text-transparent mb-2 thunder-text">
+            THUNDERMOVIES
+        </h1>
+        <p class="text-slate-400 uppercase tracking-widest text-xs font-bold font-mono">I migliori titoli alla velocità della luce</p>
+    </header>
+
+    <div class="max-w-7xl mx-auto mb-12 flex flex-wrap justify-center gap-3 sticky top-4 z-40 bg-[#0b0f1a]/90 backdrop-blur-md py-3 rounded-2xl border border-white/5 shadow-xl">
+        <button onclick="changeGenre(28, this)" class="genre-btn px-6 py-2 rounded-xl bg-yellow-600 text-black transition font-bold border border-white/10 shadow-lg">Azione</button>
+        <button onclick="changeGenre(35, this)" class="genre-btn px-6 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition font-medium border border-slate-700">Commedia</button>
+        <button onclick="changeGenre(27, this)" class="genre-btn px-6 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition font-medium border border-slate-700">Horror</button>
+        <button onclick="changeGenre(878, this)" class="genre-btn px-6 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition font-medium border border-slate-700">Sci-Fi</button>
+        <button onclick="changeGenre(18, this)" class="genre-btn px-6 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition font-medium border border-slate-700">Drammatico</button>
+    </div>
+
+    <div id="movie-grid" class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8"></div>
+
+    <div id="scroll-loader" class="text-center py-10 opacity-0 transition-opacity">
+        <div class="inline-block w-8 h-8 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+
+    <div id="movie-modal" class="fixed inset-0 z-[100] items-center justify-center p-4 bg-black/90 backdrop-blur-md hidden" onclick="closeModal(event)">
+        <div class="bg-[#111625] w-full max-w-5xl max-h-[90vh] rounded-3xl overflow-hidden shadow-2xl border border-white/10 relative flex flex-col md:flex-row" onclick="event.stopPropagation()">
+            
+            <button onclick="closeModal(event, true)" class="absolute top-5 right-5 z-50 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-yellow-600 transition">&times;</button>
+
+            <div id="modal-backdrop" class="absolute inset-0 z-0 bg-cover bg-center opacity-40"></div>
+            <div class="absolute inset-0 z-10 modal-gradient hidden md:block"></div>
+
+            <div class="relative z-20 w-full md:w-2/5 p-8 hidden md:flex justify-center items-center">
+                <img id="modal-poster" src="" class="w-full rounded-2xl shadow-2xl border border-white/10 aspect-[2/3] object-cover">
+            </div>
+
+            <div class="relative z-20 w-full md:w-3/5 p-8 md:p-12 flex flex-col overflow-y-auto">
+                <div class="flex justify-between items-start mb-4">
+                    <h2 id="modal-title" class="text-3xl font-black"></h2>
+                    <span id="modal-rating" class="bg-yellow-500 text-black font-bold px-3 py-1 rounded-lg text-sm"></span>
+                </div>
+                
+                <div class="flex flex-wrap gap-2 text-xs mb-6" id="modal-meta">
+                    <span id="modal-year" class="bg-white/10 px-3 py-1 rounded-full text-yellow-400"></span>
+                    <span id="modal-runtime" class="bg-white/10 px-3 py-1 rounded-full"></span>
+                    <div id="modal-genres" class="flex gap-2"></div>
+                </div>
+
+                <div class="flex-1">
+                    <h3 class="text-yellow-500 font-bold uppercase text-[10px] tracking-widest mb-2">Trama</h3>
+                    <p id="modal-overview" class="text-slate-300 leading-relaxed font-light text-sm md:text-base"></p>
+                </div>
+
+                <button id="modal-watch-btn" class="mt-8 w-full py-4 bg-yellow-600 hover:bg-yellow-500 text-black font-bold rounded-2xl transition">DOVE VEDERLO?</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = '72f85494d19c48faa4cb6721b66b59f1';
+        const IMG_PATH = 'https://image.tmdb.org/t/p/w500'; 
+        const BACK_PATH = 'https://image.tmdb.org/t/p/original';
+
+        let page = 1;
+        let genre = 28;
+        let loading = false;
+
+        async function loadMovies(reset = false) {
+            if (loading) return;
+            loading = true;
+            if (reset) { page = 1; document.getElementById('movie-grid').innerHTML = ''; }
+            
+            document.getElementById('scroll-loader').classList.add('opacity-100');
+
+            try {
+                const res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genre}&language=it-IT&sort_by=popularity.desc&page=${page}`);
+                const data = await res.json();
+                
+                data.results.forEach(movie => {
+                    const card = document.createElement('div');
+                    card.className = "movie-card bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 flex flex-col";
+                    card.onclick = () => openModal(movie.id);
+                    
+                    const poster = movie.poster_path ? IMG_PATH + movie.poster_path : 'https://placehold.co/500x750/1e293b/white?text=No+Image';
+                    
+                    card.innerHTML = `
+                        <div class="relative aspect-[2/3] overflow-hidden">
+                            <img src="${poster}" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 img-gradient"></div>
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col">
+                            <h2 class="font-bold text-xs mb-2 line-clamp-2">${movie.title}</h2>
+                            <p class="text-[10px] text-slate-500 line-clamp-2">${movie.overview || ''}</p>
+                        </div>
+                    `;
+                    document.getElementById('movie-grid').appendChild(card);
+                });
+                page++;
+            } catch (e) { console.error(e); }
+            
+            loading = false;
+            document.getElementById('scroll-loader').classList.remove('opacity-100');
+        }
+
+        async function openModal(id) {
+            const modal = document.getElementById('movie-modal');
+            modal.classList.remove('hidden');
+            document.body.classList.add('modal-open');
+
+            const res = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=it-IT`);
+            const m = await res.json();
+
+            document.getElementById('modal-title').innerText = m.title;
+            document.getElementById('modal-overview').innerText = m.overview || "Trama non disponibile.";
+            document.getElementById('modal-rating').innerText = `★ ${m.vote_average.toFixed(1)}`;
+            document.getElementById('modal-year').innerText = m.release_date.split('-')[0];
+            document.getElementById('modal-runtime').innerText = `${m.runtime} min`;
+            document.getElementById('modal-poster').src = m.poster_path ? IMG_PATH + m.poster_path : '';
+            document.getElementById('modal-backdrop').style.backgroundImage = `url(${BACK_PATH + m.backdrop_path})`;
+            
+            const gDiv = document.getElementById('modal-genres');
+            gDiv.innerHTML = '';
+            m.genres.forEach(g => {
+                gDiv.innerHTML += `<span class="bg-yellow-500/10 text-yellow-500 px-2 py-0.5 rounded border border-yellow-500/20">${g.name}</span>`;
+            });
+
+            document.getElementById('modal-watch-btn').onclick = () => window.open(`https://www.google.com/search?q=dove+vedere+${encodeURIComponent(m.title)}`, '_blank');
+        }
+
+        function closeModal(e, force = false) {
+            if (force || (e && e.target.id === 'movie-modal')) {
+                document.getElementById('movie-modal').classList.add('hidden');
+                document.body.classList.remove('modal-open');
+            }
+        }
+
+        function changeGenre(id, btn) {
+            genre = id;
+            document.querySelectorAll('.genre-btn').forEach(b => {
+                b.className = "genre-btn px-6 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition font-medium border border-slate-700";
+            });
+            btn.className = "genre-btn px-6 py-2 rounded-xl bg-yellow-600 text-black transition font-bold border border-white/10 shadow-lg";
+            loadMovies(true);
+        }
+
+        window.onscroll = () => {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000) loadMovies();
+        };
+
+        loadMovies();
+    </script>
+</body>
+</html>
