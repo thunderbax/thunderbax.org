@@ -26,7 +26,6 @@
             overflow-x: hidden;
         }
 
-        /* Overlay per migliorare il contrasto generale */
         body::before {
             content: "";
             position: fixed;
@@ -35,7 +34,6 @@
             z-index: -1;
         }
 
-        /* WIDGET SUPERIORI */
         .top-widgets {
             position: absolute;
             top: 20px;
@@ -63,18 +61,18 @@
 
         header {
             text-align: center;
-            margin-top: 6rem;
+            margin-top: 5rem;
             z-index: 20;
             background: radial-gradient(circle, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 70%);
-            padding: 40px 0;
+            padding: 30px 0;
             width: 100%;
         }
 
         h1 {
-            font-size: 5rem;
+            font-size: 4.5rem;
             margin: 0;
             color: var(--gold);
-            letter-spacing: 8px;
+            letter-spacing: 6px;
             text-transform: uppercase;
             font-weight: bold;
             text-shadow: 4px 4px 0px rgba(0,0,0,1), -1px -1px 0px rgba(0,0,0,1), 0px 0px 30px rgba(168, 107, 50, 0.6); 
@@ -86,27 +84,28 @@
         .subtitle {
             font-family: 'Courier New', Courier, monospace;
             font-weight: bold;
-            font-size: 1.3rem;
-            margin-top: 20px;
+            font-size: 1.2rem;
+            margin-top: 15px;
             color: #ffffff;
             text-transform: uppercase;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
             background: rgba(139, 69, 19, 0.5);
-            padding: 8px 25px;
+            padding: 6px 20px;
             border-radius: 3px;
             text-shadow: 2px 2px 4px rgba(0,0,0,1);
             display: inline-block;
         }
 
-        /* CONTAINER CARD AI LATI */
+        /* CONTAINER BILANCIATO PER 3 CARD */
         .card-container {
             position: absolute;
-            top: 55%;
+            top: 60%; /* Leggermente più basso per non coprire il viso */
             transform: translateY(-50%);
             width: 100%;
             display: flex;
-            justify-content: space-between;
-            padding: 0 6%;
+            justify-content: center;
+            gap: 2rem;
+            padding: 0 4%;
             box-sizing: border-box;
             z-index: 10;
         }
@@ -115,58 +114,66 @@
             background: var(--glass);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            padding: 2.5rem;
+            padding: 2rem;
             border-radius: 12px;
-            width: 280px;
+            width: 300px;
             text-align: center;
             text-decoration: none;
             color: #f1e7d0;
             border: 2px solid var(--bronze);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .card:hover {
-            transform: scale(1.08);
+            transform: scale(1.05);
             border-color: var(--gold);
             background: rgba(168, 107, 50, 0.3);
             box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
         }
 
         .card h2 {
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            margin-bottom: 0.8rem;
             color: var(--gold);
             text-transform: uppercase;
         }
 
+        .card p {
+            line-height: 1.4;
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+        }
+
         .btn-link {
             display: inline-block;
-            margin-top: 15px;
-            padding: 10px 20px;
+            padding: 8px 15px;
             background: var(--bronze);
             color: white;
             border-radius: 4px;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
 
         footer {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             font-size: 0.8rem;
             color: var(--gold);
             background: rgba(0,0,0,0.6);
             padding: 8px 20px;
             border-radius: 30px;
             z-index: 20;
+            letter-spacing: 1px;
         }
 
-        /* Responsive */
-        @media (max-width: 900px) {
-            h1 { font-size: 2.5rem; }
-            .card-container { position: static; transform: none; flex-direction: column; align-items: center; gap: 2rem; padding: 3rem 0; }
-            .top-widgets { position: relative; flex-direction: column; align-items: center; gap: 10px; top: 10px; padding: 0; }
+        @media (max-width: 1100px) {
+            .card-container { position: static; transform: none; flex-direction: column; align-items: center; padding: 2rem 0; }
+            h1 { font-size: 3rem; }
         }
     </style>
 </head>
@@ -185,14 +192,26 @@
 
     <div class="card-container">
         <a href="wallpaper.html" class="card">
-            <h2>Wallpaper</h2>
-            <p>Galleria di visioni digitali e sfondi creati su misura.</p>
+            <div>
+                <h2>Wallpaper</h2>
+                <p>Galleria di visioni digitali e sfondi creati su misura.</p>
+            </div>
             <div class="btn-link">Entra</div>
         </a>
 
+        <a href="movie.html" class="card">
+            <div>
+                <h2>ThunderMovies</h2>
+                <p>Scopri i migliori film e dove vederli in streaming.</p>
+            </div>
+            <div class="btn-link">Esplora</div>
+        </a>
+
         <a href="abadonware.html" class="card">
-            <h2>Abadonware</h2>
-            <p>Recupero di software dal passato e archeologia informatica.</p>
+            <div>
+                <h2>Abadonware</h2>
+                <p>Recupero di software dal passato e archeologia informatica.</p>
+            </div>
             <div class="btn-link">Accedi</div>
         </a>
     </div>
@@ -202,7 +221,6 @@
     </footer>
 
     <script>
-        // OROLOGIO
         function updateClock() {
             const now = new Date();
             document.getElementById('clock').textContent = now.toLocaleTimeString('it-IT');
@@ -210,7 +228,6 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // METEO GEOLOCALIZZATO
         function getWeatherData() {
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(async (position) => {
